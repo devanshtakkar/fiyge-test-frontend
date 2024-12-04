@@ -40,6 +40,9 @@ The **Form Builder Application** is a web-based tool that allows users to build 
 
 ---
 
+Watch this video demonstration to see the Form Builder in action:  
+[![Form Builder Demo](https://img.youtube.com/vi/MngOoDEK-eo/0.jpg)](https://www.youtube.com/watch?v=MngOoDEK-eo)  
+Click on the thumbnail or [here](https://www.youtube.com/watch?v=MngOoDEK-eo) to watch the video.
 ## How to Use
 
 ### Form Builder Features
