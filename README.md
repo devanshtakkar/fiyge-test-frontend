@@ -1,6 +1,4 @@
-Here's the updated README with the detailed backend server setup instructions:
 
-```markdown
 # Form Builder Application
 
 ## Overview
@@ -95,4 +93,3 @@ Click on the thumbnail or [here](https://www.youtube.com/watch?v=MngOoDEK-eo) to
      - **Console Log**: The latest structure is logged to the console.
      - **Network Tab**: Inspect the network requests to see the saved form data.
 
----
