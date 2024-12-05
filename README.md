@@ -68,8 +68,8 @@ You will need these credentials to log in and access the application.
 ---
 
 Watch this video demonstration to see the Form Builder in action:  
-[![Form Builder Demo](https://img.youtube.com/vi/MngOoDEK-eo/0.jpg)](https://www.youtube.com/watch?v=MngOoDEK-eo)  
-Click on the thumbnail or [here](https://www.youtube.com/watch?v=MngOoDEK-eo) to watch the video.
+[![Form Builder Demo](https://img.youtube.com/vi/lNKFgMudUsU/0.jpg)](https://www.youtube.com/watch?v=lNKFgMudUsU)  
+Click on the thumbnail or [here](https://www.youtube.com/watch?v=lNKFgMudUsU) to watch the video.
 
 ---
 
