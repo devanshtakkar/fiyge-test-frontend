@@ -107,7 +107,7 @@ export default function Editsection({
                     <TextField
                         label="Regular Expression"
                         name="regex"
-                        value={formData.placeholder}
+                        value={formData.regex}
                         onChange={handleChange}
                     ></TextField>
                 </>
