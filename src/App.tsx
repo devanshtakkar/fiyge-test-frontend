@@ -30,6 +30,7 @@ import {
 import { SortableItem } from "./SortableItem";
 import EditableComponent from "./EditableComponent";
 import Editsection from "./EditSection";
+import LoginForm from "./LoginForm";
 
 export interface FormElement {
     id: string;
@@ -57,6 +58,10 @@ function getRandomNumber() {
 }
 
 function App() {
+    let [auth, setAuth] = useState({
+        user: null,
+        jwt: null,
+    });
     let [formItems, setFormItems] = useState<string[]>([]);
     let [formjson, setFormjson] = useState<any>({
         id: "",
@@ -79,7 +84,11 @@ function App() {
     async function fetchForms(e) {
         setSaveFormMenuAnchor(e.target);
         try {
-            let response = await fetch("http://localhost:3000/api/forms/list");
+            let response = await fetch("http://localhost:3000/api/forms/list", {
+                headers: {
+                    Authorization: `Bearer ${auth.jwt}`,
+                },
+            });
             if (response.ok) {
                 let forms = await response.json();
                 setSavedForms(forms);
@@ -107,10 +116,10 @@ function App() {
             }
         });
         //update the form on the server as well
-        if (formIndex !== -1){
-            try{
+        if (formIndex !== -1) {
+            try {
                 fetch(`http://localhost:3000/api/forms/update/${formjson.id}`, {
-                    method: "post",
+                    method: "put",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -118,12 +127,11 @@ function App() {
                 }).then((data) => {
                     console.log(data.json());
                 });
-            }catch(err){
+            } catch (err) {
                 console.log(err);
             }
             return;
         }
-        
 
         console.log(`Form saved or updated: `);
         console.log(formjson);
@@ -133,8 +141,7 @@ function App() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(formjson),
-        }).then((data) => {
-        });
+        }).then((data) => {});
         setSaveBtn("Check Console for final form");
     }
 
@@ -162,7 +169,6 @@ function App() {
             return;
         }
         if (activeId.endsWith("_dyn")) {
-
             if (activeId !== overId) {
                 setFormjson((prevFormItems) => {
                     // Find the old and new indexes of the items
@@ -224,180 +230,201 @@ function App() {
             });
         }
     }
-    return (
-        <DndContext onDragEnd={handleDrop}>
-            <Container>
-                <Button onClick={fetchForms}>Saved Forms</Button>
-                <Menu
-                    open={formMenuOpen}
-                    anchorEl={saveFormMenuAnchor}
-                    onClose={() => setFormMenuOpen(false)}
-                >
-                    {savedForms?.map((form, index) => (
-                        <MenuItem
-                            onClick={() => {
-                                setFormjson({
-                                    title: form.form_name,
-                                    form: form.form_data,
-                                    id: form.id
-                                });
-                            }}
-                        >
-                            {form.form_name}
-                        </MenuItem>
-                    ))}
-                </Menu>
-            </Container>
-            <Container>
-                <Grid2 container spacing={3}>
-                    <Grid2 size={5}>
-                        <Typography variant="h3">Form Builder</Typography>
-                        <TextField
-                            value={formjson.title}
-                            onChange={(e) => {
-                                setFormjson((prev) => {
-                                    return {
-                                        title: e.target.value,
-                                        form: prev.form,
-                                        id: prev.id
-                                    };
-                                });
-                            }}
-                            label="Form's title"
-                            fullWidth
-                        />
-                        <Droppable>
-                            <SortableContext
-                                items={formItems}
-                                strategy={verticalListSortingStrategy}
-                            >
-                                {formjson.form.map((value, index) => (
-                                    <Stack
-                                        direction={"row"}
-                                        alignItems={"center"}
-                                        justifyContent={"space-between"}
-                                    >
-                                        <SortableItem
-                                            id={`${value.id}`}
-                                            key={index}
-                                        >
-                                            <EditableComponent
-                                                properties={value}
-                                            ></EditableComponent>
-                                        </SortableItem>
-                                        <Button
-                                            onClick={() => {
-                                                handleEdit(value.id);
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
 
-                                        <Button
-                                            variant="contained"
-                                            color="error"
-                                            onClick={() => {
-                                                handleDelete(value.id);
-                                            }}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </Stack>
-                                ))}
-                            </SortableContext>
-                        </Droppable>
-                    </Grid2>
-                    <Grid2 size={4}>
-                        <Typography variant="h3">Components</Typography>
-                        <Draggable id="text">
-                            <TextField
-                                label="Textfield"
-                                variant="outlined"
-                            ></TextField>
-                        </Draggable>
-                        <Draggable id="textarea">
-                            <TextField
-                                label="Textarea"
-                                variant="outlined"
-                                multiline
-                                rows={4}
-                            ></TextField>
-                        </Draggable>
-                        <Draggable id="number">
-                            <InputLabel>Number Input</InputLabel>
-                            <input type="number" placeholder="" name="number" id="num"></input>
-                        </Draggable>
-                        <Draggable id="select">
-                            <InputLabel>Select Dropdown</InputLabel>
-                            <select name="select">
-                                <option value="volvo">Volvo</option>
-                            </select>
-                        </Draggable>
-                        <Draggable id="checkbox">
-                            <FormGroup>
-                                <FormControlLabel
-                                    control={<Checkbox defaultChecked />}
-                                    label="Checkbox"
-                                />
-                            </FormGroup>
-                        </Draggable>
-                        <Draggable id="radio">
-                            <FormControl>
-                                <FormLabel id="demo-radio-buttons-group-label">
-                                    Radio Buttons
-                                </FormLabel>
-                                <RadioGroup
-                                    defaultValue="female"
-                                    name="radio-buttons-group"
+    return (
+        <>
+            {auth.jwt ? (
+                <DndContext onDragEnd={handleDrop}>
+                    <Container>
+                        <Button onClick={fetchForms}>Saved Forms</Button>
+                        <Menu
+                            open={formMenuOpen}
+                            anchorEl={saveFormMenuAnchor}
+                            onClose={() => setFormMenuOpen(false)}
+                        >
+                            {savedForms?.map((form, index) => (
+                                <MenuItem
+                                    key={index}
+                                    onClick={() => {
+                                        console.log(form);
+                                        setFormjson({
+                                            title: form.form_name,
+                                            form: form.form_data,
+                                            id: form.id,
+                                        });
+                                    }}
                                 >
-                                    <FormControlLabel
-                                        value="female"
-                                        control={<Radio />}
-                                        label="Female"
-                                    />
-                                    <FormControlLabel
-                                        value="male"
-                                        control={<Radio />}
-                                        label="Male"
-                                    />
-                                </RadioGroup>
-                            </FormControl>
-                        </Draggable>
-                        <Draggable id="date">
-                            <InputLabel>Date Picker</InputLabel>
-                            <input type="date"></input>
-                        </Draggable>
-                    </Grid2>
-                    <Grid2 size={3}>
-                        <Typography variant="h3">Customization</Typography>
-                        {editing.show ? (
-                            <>
-                                <Editsection
-                                    element={editing.element}
-                                    setFormjson={setFormjson}
+                                    {form.form_name}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </Container>
+                    <Container>
+                        <Grid2 container spacing={3}>
+                            <Grid2 size={5}>
+                                <Typography variant="h3">
+                                    Form Builder
+                                </Typography>
+                                <TextField
+                                    value={formjson.title}
+                                    onChange={(e) => {
+                                        setFormjson((prev) => {
+                                            console.log(prev)
+                                            return {
+                                                title: e.target.value,
+                                                form: prev.form,
+                                                id: prev.id,
+                                            };
+                                        });
+                                    }}
+                                    label="Form's title"
+                                    fullWidth
                                 />
-                                <Box>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => {
-                                            setEditing({
-                                                show: false,
-                                            });
-                                        }}
+                                <Droppable>
+                                    <SortableContext
+                                        items={formItems}
+                                        strategy={verticalListSortingStrategy}
                                     >
-                                        Close
-                                    </Button>
-                                </Box>
-                            </>
-                        ) : null}
-                    </Grid2>
-                </Grid2>
-                <Button size="large" onClick={saveform}>
-                    Save or Update Form
-                </Button>
-                <Typography variant="h6">{savebtn}</Typography>
-            </Container>
-        </DndContext>
+                                        {formjson.form.map((value, index) => (
+                                            <Stack
+                                                direction={"row"}
+                                                alignItems={"center"}
+                                                justifyContent={"space-between"}
+                                            >
+                                                <SortableItem
+                                                    id={`${value.id}`}
+                                                    key={index}
+                                                >
+                                                    <EditableComponent
+                                                        properties={value}
+                                                    ></EditableComponent>
+                                                </SortableItem>
+                                                <Button
+                                                    onClick={() => {
+                                                        handleEdit(value.id);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </Button>
+
+                                                <Button
+                                                    variant="contained"
+                                                    color="error"
+                                                    onClick={() => {
+                                                        handleDelete(value.id);
+                                                    }}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </Stack>
+                                        ))}
+                                    </SortableContext>
+                                </Droppable>
+                            </Grid2>
+                            <Grid2 size={4}>
+                                <Typography variant="h3">Components</Typography>
+                                <Draggable id="text">
+                                    <TextField
+                                        label="Textfield"
+                                        variant="outlined"
+                                    ></TextField>
+                                </Draggable>
+                                <Draggable id="textarea">
+                                    <TextField
+                                        label="Textarea"
+                                        variant="outlined"
+                                        multiline
+                                        rows={4}
+                                    ></TextField>
+                                </Draggable>
+                                <Draggable id="number">
+                                    <InputLabel>Number Input</InputLabel>
+                                    <input
+                                        type="number"
+                                        placeholder=""
+                                        name="number"
+                                        id="num"
+                                    ></input>
+                                </Draggable>
+                                <Draggable id="select">
+                                    <InputLabel>Select Dropdown</InputLabel>
+                                    <select name="select">
+                                        <option value="volvo">Volvo</option>
+                                    </select>
+                                </Draggable>
+                                <Draggable id="checkbox">
+                                    <FormGroup>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox defaultChecked />
+                                            }
+                                            label="Checkbox"
+                                        />
+                                    </FormGroup>
+                                </Draggable>
+                                <Draggable id="radio">
+                                    <FormControl>
+                                        <FormLabel id="demo-radio-buttons-group-label">
+                                            Radio Buttons
+                                        </FormLabel>
+                                        <RadioGroup
+                                            defaultValue="female"
+                                            name="radio-buttons-group"
+                                        >
+                                            <FormControlLabel
+                                                value="female"
+                                                control={<Radio />}
+                                                label="Female"
+                                            />
+                                            <FormControlLabel
+                                                value="male"
+                                                control={<Radio />}
+                                                label="Male"
+                                            />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </Draggable>
+                                <Draggable id="date">
+                                    <InputLabel>Date Picker</InputLabel>
+                                    <input type="date"></input>
+                                </Draggable>
+                            </Grid2>
+                            <Grid2 size={3}>
+                                <Typography variant="h3">
+                                    Customization
+                                </Typography>
+                                {editing.show ? (
+                                    <>
+                                        <Editsection
+                                            element={editing.element}
+                                            setFormjson={setFormjson}
+                                        />
+                                        <Box>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => {
+                                                    setEditing({
+                                                        show: false,
+                                                    });
+                                                }}
+                                            >
+                                                Close
+                                            </Button>
+                                        </Box>
+                                    </>
+                                ) : null}
+                            </Grid2>
+                        </Grid2>
+                        <Button size="large" onClick={saveform}>
+                            Save or Update Form
+                        </Button>
+                        <Typography variant="h6">{savebtn}</Typography>
+                    </Container>
+                </DndContext>
+            ) : (
+                <LoginForm setAuth={setAuth} />
+            )}
+        </>
     );
 }
 
