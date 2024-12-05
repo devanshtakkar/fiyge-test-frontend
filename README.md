@@ -1,4 +1,6 @@
+Here's the updated README with the detailed backend server setup instructions:
 
+```markdown
 # Form Builder Application
 
 ## Overview
@@ -20,14 +22,33 @@ The **Form Builder Application** is a web-based tool that allows users to build 
 ### Prerequisites
 - Ensure you have **Node.js** and **npm** installed on your machine.
 
-### Setup Instructions
-1. Clone the repository:
+### Backend Server Setup
+1. Clone the backend server repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/devanshtakkar/fiyge-test-backend
+   ```
+2. Navigate to the backend project directory:
+   ```bash
+   cd fiyge-test-backend
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the backend server:
+   ```bash
+   node index.js
+   ```
+   - The backend server is required to authenticate users and retrieve the auth token during login.
+
+### Frontend Setup
+1. Clone the Form Builder repository:
+   ```bash
+   git clone https://github.com/devanshtakkar/fiyge-test-frontend
    ```
 2. Navigate to the project directory:
    ```bash
-   cd <repository-folder>
+   cd https://github.com/devanshtakkar/fiyge-test-frontend
    ```
 3. Install dependencies:
    ```bash
@@ -40,9 +61,20 @@ The **Form Builder Application** is a web-based tool that allows users to build 
 
 ---
 
+## Login Credentials
+- **Username**: `user`
+- **Password**: `password`
+
+You will need these credentials to log in and access the application.
+
+---
+
 Watch this video demonstration to see the Form Builder in action:  
 [![Form Builder Demo](https://img.youtube.com/vi/MngOoDEK-eo/0.jpg)](https://www.youtube.com/watch?v=MngOoDEK-eo)  
 Click on the thumbnail or [here](https://www.youtube.com/watch?v=MngOoDEK-eo) to watch the video.
+
+---
+
 ## How to Use
 
 ### Form Builder Features
@@ -62,11 +94,5 @@ Click on the thumbnail or [here](https://www.youtube.com/watch?v=MngOoDEK-eo) to
    - Check the final form structure:
      - **Console Log**: The latest structure is logged to the console.
      - **Network Tab**: Inspect the network requests to see the saved form data.
-
----
-
-## Development Notes
-- This project is in active development. Contributions are welcome!
-- For any issues, please create a GitHub issue in the repository.
 
 ---
