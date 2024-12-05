@@ -17,6 +17,7 @@ import {
     Stack,
     Button,
     Box,
+    Menu,
 } from "@mui/material";
 import Draggable from "./Draggable";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
@@ -58,7 +59,8 @@ function getRandomNumber() {
 function App() {
     let [formItems, setFormItems] = useState<string[]>([]);
     let [formjson, setFormjson] = useState<any>({
-        title: "Dynamic form",
+        id: "",
+        title: "",
         form: [],
     });
 
@@ -72,21 +74,68 @@ function App() {
         show: false,
     });
 
-    function saveform(){
+    let [formMenuOpen, setFormMenuOpen] = useState(false);
+    let [saveFormMenuAnchor, setSaveFormMenuAnchor] = useState(null);
+    async function fetchForms(e) {
+        setSaveFormMenuAnchor(e.target);
+        try {
+            let response = await fetch("http://localhost:3000/api/forms/list");
+            if (response.ok) {
+                let forms = await response.json();
+                setSavedForms(forms);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+        setFormMenuOpen(true);
+    }
+    function saveform() {
+        const formIndex = savedForms.findIndex(
+            (form) => form.id === formjson.id
+        );
+
         setSavedForms((prev) => {
-            return [...prev, formjson]
-        })
-        console.log(formjson);
+            if (formIndex !== -1) {
+                // Update the existing form
+                const updatedForms = [...prev];
+                updatedForms[formIndex] = formjson;
+                return updatedForms;
+            } else {
+                // Append the new form
+                return [...prev, formjson];
+            }
+        });
+        //update the form on the server as well
+        if (formIndex !== -1){
+            try{
+                fetch(`http://localhost:3000/api/forms/update/${formjson.id}`, {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formjson),
+                }).then((data) => {
+                    console.log(data.json());
+                });
+            }catch(err){
+                console.log(err);
+            }
+            return;
+        }
+        
+
+        console.log(`Form saved or updated: ${formjson}`);
         fetch("http://localhost:3000/api/forms/save", {
             method: "post",
             headers: {
-                'Content-Type': 'application/json',
-              },
-            body: JSON.stringify(formjson)
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formjson),
         }).then((data) => {
-            console.log(data.json())
-        })
-        setSaveBtn("Check Console for final form")
+            console.log(data.json());
+        });
+        setSaveBtn("Check Console for final form");
     }
 
     function handleDelete(id) {
@@ -118,13 +167,6 @@ function App() {
             console.log(`to be sorted`);
 
             if (activeId !== overId) {
-                // setFormItems((items) => {
-                //     const oldIndex = items.indexOf(activeId);
-                //     const newIndex = items.indexOf(overId);
-
-                //     return arrayMove(items, oldIndex, newIndex);
-                // });
-
                 setFormjson((prevFormItems) => {
                     // Find the old and new indexes of the items
                     const oldIndex = prevFormItems.form.findIndex(
@@ -189,9 +231,45 @@ function App() {
     return (
         <DndContext onDragEnd={handleDrop}>
             <Container>
+                <Button onClick={fetchForms}>Saved Forms</Button>
+                <Menu
+                    open={formMenuOpen}
+                    anchorEl={saveFormMenuAnchor}
+                    onClose={() => setFormMenuOpen(false)}
+                >
+                    {savedForms?.map((form, index) => (
+                        <MenuItem
+                            onClick={() => {
+                                setFormjson({
+                                    title: form.form_name,
+                                    form: form.form_data,
+                                    id: form.id
+                                });
+                            }}
+                        >
+                            {form.form_name}
+                        </MenuItem>
+                    ))}
+                </Menu>
+            </Container>
+            <Container>
                 <Grid2 container spacing={3}>
                     <Grid2 size={5}>
                         <Typography variant="h3">Form Builder</Typography>
+                        <TextField
+                            value={formjson.title}
+                            onChange={(e) => {
+                                setFormjson((prev) => {
+                                    return {
+                                        title: e.target.value,
+                                        form: prev.form,
+                                        id: prev.id
+                                    };
+                                });
+                            }}
+                            label="Form's title"
+                            fullWidth
+                        />
                         <Droppable>
                             <SortableContext
                                 items={formItems}
@@ -294,19 +372,29 @@ function App() {
                         <Typography variant="h3">Customization</Typography>
                         {editing.show ? (
                             <>
-                                <Editsection element={editing.element} setFormjson={setFormjson}/>
+                                <Editsection
+                                    element={editing.element}
+                                    setFormjson={setFormjson}
+                                />
                                 <Box>
-                                    <Button variant="contained" onClick={() => {
-                                        setEditing({
-                                            show: false
-                                        })
-                                    }}>Close</Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => {
+                                            setEditing({
+                                                show: false,
+                                            });
+                                        }}
+                                    >
+                                        Close
+                                    </Button>
                                 </Box>
                             </>
                         ) : null}
                     </Grid2>
                 </Grid2>
-                <Button size="large" onClick={saveform}>{savebtn}</Button>
+                <Button size="large" onClick={saveform}>
+                    {savebtn}
+                </Button>
             </Container>
         </DndContext>
     );
