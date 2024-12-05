@@ -3,6 +3,7 @@ import {
     FormControl,
     FormControlLabel,
     FormLabel,
+    InputLabel,
     Radio,
     RadioGroup,
     Stack,
@@ -20,13 +21,13 @@ export default function Editsection({
     setFormjson?: any;
 }) {
     const [formData, setFormData] = useState({
-        ...element
+        ...element,
     });
     useEffect(() => {
         setFormData({
-            ...element
-        })
-    },[element])
+            ...element,
+        });
+    }, [element]);
 
     // const [options, setOptions] = useState(element?.option || []);
     let [newOption, setNewoption] = useState("");
@@ -46,7 +47,7 @@ export default function Editsection({
         console.log(formData);
         e.preventDefault();
         setFormjson((prev) => {
-            console.log(prev)
+            console.log(prev);
             const index = prev.form.findIndex((obj) => obj.id === element?.id);
             const newArray = [
                 ...prev.form.slice(0, index),
@@ -96,12 +97,42 @@ export default function Editsection({
             ></TextField>
 
             {element?.type == "text" || element?.type == "textarea" ? (
-                <TextField
-                    label="placeholder text"
-                    name="placeholder"
-                    value={formData.placeholder}
-                    onChange={handleChange}
-                ></TextField>
+                <>
+                    <TextField
+                        label="placeholder text"
+                        name="placeholder"
+                        value={formData.placeholder}
+                        onChange={handleChange}
+                    ></TextField>
+                    <TextField
+                        label="Regular Expression"
+                        name="regex"
+                        value={formData.placeholder}
+                        onChange={handleChange}
+                    ></TextField>
+                </>
+            ) : null}
+
+            {element?.type == "number" ? (
+                <>
+                    <InputLabel>Minimum value</InputLabel>
+                    <input
+                        type="number"
+                        placeholder=""
+                        name="min"
+                        id="num"
+                        onChange={handleChange}
+                    ></input>
+
+                    <InputLabel>Maximum value</InputLabel>
+                    <input
+                        type="number"
+                        placeholder=""
+                        name="max"
+                        id="num"
+                        onChange={handleChange}
+                    ></input>
+                </>
             ) : null}
 
             <FormControl>

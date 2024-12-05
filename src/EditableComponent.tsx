@@ -62,6 +62,23 @@ export default function EditableComponent(props: {
                 </>
             );
 
+        case "number":
+            return (
+                <>
+                    <InputLabel>
+                        {props.properties?.name || props.properties.id}
+                    </InputLabel>
+                    <input
+                        type="number"
+                        placeholder={props.properties?.placeholder}
+                        name={props.properties?.name}
+                        id="num"
+                        min={props.properties?.min}
+                        max={props.properties?.max}
+                    ></input>
+                </>
+            );
+
         case "select":
             return (
                 <>

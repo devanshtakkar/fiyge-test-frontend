@@ -65,7 +65,7 @@ function App() {
     });
 
     let [savedForms, setSavedForms] = useState<any[]>([]);
-    let [savebtn, setSaveBtn] = useState("Save From and Send");
+    let [savebtn, setSaveBtn] = useState("");
 
     let [editing, setEditing] = useState<{
         show: boolean;
@@ -125,7 +125,8 @@ function App() {
         }
         
 
-        console.log(`Form saved or updated: ${formjson}`);
+        console.log(`Form saved or updated: `);
+        console.log(formjson);
         fetch("http://localhost:3000/api/forms/save", {
             method: "post",
             headers: {
@@ -133,13 +134,11 @@ function App() {
             },
             body: JSON.stringify(formjson),
         }).then((data) => {
-            console.log(data.json());
         });
         setSaveBtn("Check Console for final form");
     }
 
     function handleDelete(id) {
-        console.log("delete");
         let updatedFrom = formjson.form.filter((obj) => obj.id !== id);
         setFormjson({
             ...formjson,
@@ -159,12 +158,10 @@ function App() {
     function handleDrop(event: DragEndEvent) {
         let activeId = event.active.id as string;
         let overId = event.over?.id as string;
-        console.log(event.active.data);
         if (!overId) {
             return;
         }
         if (activeId.endsWith("_dyn")) {
-            console.log(`to be sorted`);
 
             if (activeId !== overId) {
                 setFormjson((prevFormItems) => {
@@ -191,7 +188,6 @@ function App() {
                 });
             }
         } else {
-            console.log(activeId, overId);
             if (formItems.includes(`${activeId}_dyn`)) {
                 let type = activeId.split("_")[0];
                 let newId = `${event.active.id}_${getRandomNumber()}_dyn`;
@@ -327,6 +323,10 @@ function App() {
                                 rows={4}
                             ></TextField>
                         </Draggable>
+                        <Draggable id="number">
+                            <InputLabel>Number Input</InputLabel>
+                            <input type="number" placeholder="" name="number" id="num"></input>
+                        </Draggable>
                         <Draggable id="select">
                             <InputLabel>Select Dropdown</InputLabel>
                             <select name="select">
@@ -393,8 +393,9 @@ function App() {
                     </Grid2>
                 </Grid2>
                 <Button size="large" onClick={saveform}>
-                    {savebtn}
+                    Save or Update Form
                 </Button>
+                <Typography variant="h6">{savebtn}</Typography>
             </Container>
         </DndContext>
     );
