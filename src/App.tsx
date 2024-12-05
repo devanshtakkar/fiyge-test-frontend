@@ -122,6 +122,7 @@ function App() {
                     method: "put",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${auth.jwt}`,
                     },
                     body: JSON.stringify(formjson),
                 }).then((data) => {
@@ -139,6 +140,7 @@ function App() {
             method: "post",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${auth.jwt}`,
             },
             body: JSON.stringify(formjson),
         }).then((data) => {});
